@@ -2,6 +2,10 @@ import java.util.ArrayList;
 
 public class ResourceCentre {
 
+	/**
+	 * 
+	 */
+	private static final int optionfive = 5;
 	public static void main(String[] args) {
 
 		ArrayList<Camcorder> camcorderList = new ArrayList<Camcorder>();
@@ -14,7 +18,7 @@ public class ResourceCentre {
 
 		int option = 0;
 
-		while (option != 5) {
+		while (option != optionfive) {
 
 			ResourceCentre.menu();
 			option = Helper.readInt("Enter an option > ");
@@ -84,7 +88,7 @@ public class ResourceCentre {
 					System.out.println("Invalid type");
 				}
 
-			} else if (option == 5) {
+			} else if (option == optionfive) {
 				System.out.println("Bye!");
 			} else {
 				System.out.println("Invalid option");
@@ -111,16 +115,7 @@ public class ResourceCentre {
 		Helper.line(80, "-");
 	}
 
-	public static String showAvailability(boolean isAvailable) {
-		String avail;
-
-		if (isAvailable == true) {
-			avail = "Yes";
-		} else {
-			avail = "No";
-		}
-		return avail;
-	}
+	
 
 	//================================= Option 1 View =================================
 	public static String retrieveAllCamcorder(ArrayList<Camcorder> camcorderList) {
@@ -128,10 +123,9 @@ public class ResourceCentre {
 
 		for (int i = 0; i < camcorderList.size(); i++) {
 
-			output += String.format("%-10s %-30s %-10s %-10s %-20d\n", camcorderList.get(i).getAssetTag(),
-					camcorderList.get(i).getDescription(), 
-					ResourceCentre.showAvailability(camcorderList.get(i).getIsAvailable()),
-					camcorderList.get(i).getDueDate(),camcorderList.get(i).getOpticalZoom());
+			String stringoutput = camcorderList.get(i).toString();
+			output += String.format("%-84s\n", stringoutput);
+					
 		}
 		return output;
 	}
@@ -148,10 +142,8 @@ public class ResourceCentre {
 		// write your code here
 		for (int i = 0; i < chromebookList.size(); i++) {
 
-			output += String.format("%-10s %-30s %-10s %-10s %-20s\n", chromebookList.get(i).getAssetTag(),
-					chromebookList.get(i).getDescription(), 
-					ResourceCentre.showAvailability(chromebookList.get(i).getIsAvailable()),
-					chromebookList.get(i).getDueDate(),chromebookList.get(i).getOs());
+			String stringoutput = chromebookList.get(i).toString();
+			output += String.format("%-83s",stringoutput);
 		}
 		return output;
 	}
@@ -200,12 +192,26 @@ public class ResourceCentre {
 		
 		boolean isLoaned = false;
 
+		isLoaned = doloancammethod(camcorderList, tag, dueDate, isLoaned);
+		return isLoaned;
+	}
+
+	/**
+	 * @param camcorderList
+	 * @param tag
+	 * @param dueDate
+	 * @param isLoaned
+	 * @return
+	 */
+	private static boolean doloancammethod(ArrayList<Camcorder> camcorderList, String tag, String dueDate,
+			boolean isLoaned) {
 		for (int i = 0; i < camcorderList.size(); i++) {
 			
 			String assetTag = camcorderList.get(i).getAssetTag();
 			
+			boolean isAvailable = camcorderList.get(i).getIsAvailable();
 			if (tag.equalsIgnoreCase(assetTag)				
-					&& camcorderList.get(i).getIsAvailable() == true) {
+					&& isAvailable == true) {
 				
 				camcorderList.get(i).setIsAvailable(false);
 				camcorderList.get(i).setDueDate(dueDate);
@@ -219,6 +225,13 @@ public class ResourceCentre {
 
 	public static void loanCamcorder(ArrayList<Camcorder> camcorderList) {
 		ResourceCentre.viewAllCamcorder(camcorderList);
+		extractloancam(camcorderList);
+	}
+
+	/**
+	 * @param camcorderList
+	 */
+	private static void extractloancam(ArrayList<Camcorder> camcorderList) {
 		String tag = Helper.readString("Enter asset tag > ");
 		String due = Helper.readString("Enter due date > ");
 		Boolean isLoaned =doLoanCamcorder(camcorderList, tag, due);
@@ -234,6 +247,19 @@ public class ResourceCentre {
 		// write your code here
 		boolean isLoaned = false;
 
+		isLoaned = doloanchrome(chromebookList, tag, dueDate, isLoaned);
+		return isLoaned;
+	}
+
+	/**
+	 * @param chromebookList
+	 * @param tag
+	 * @param dueDate
+	 * @param isLoaned
+	 * @return
+	 */
+	private static boolean doloanchrome(ArrayList<Chromebook> chromebookList, String tag, String dueDate,
+			boolean isLoaned) {
 		for (int i = 0; i < chromebookList.size(); i++) {
 			if (tag.equalsIgnoreCase(chromebookList.get(i).getAssetTag())
 					&& chromebookList.get(i).getIsAvailable() == true) {
@@ -251,6 +277,14 @@ public class ResourceCentre {
 	public static void loanChromebook(ArrayList<Chromebook> chromebookList) {
 		// write your code here
 		ResourceCentre.viewAllChromebook(chromebookList);
+		loaningchromebook(chromebookList);	
+		
+	}
+
+	/**
+	 * @param chromebookList
+	 */
+	private static void loaningchromebook(ArrayList<Chromebook> chromebookList) {
 		String tag = Helper.readString("Enter asset tag > ");
 		String due = Helper.readString("Enter due date > ");
 		Boolean isLoaned =doLoanChromebook(chromebookList, tag, due);
@@ -258,13 +292,24 @@ public class ResourceCentre {
 			System.out.println("Invalid asset tag");
 		} else {
 			System.out.println("Chromebook " + tag + " loaned out");
-		}	
-		
+		}
 	}
 	//================================= Option 4 Return =================================
 	public static boolean doReturnCamcorder(ArrayList<Camcorder> camcorderList,String tag) {
 		boolean isReturned = false;
 
+		isReturned = extracted(camcorderList, tag, isReturned);
+		return isReturned;
+		
+	}
+
+	/**
+	 * @param camcorderList
+	 * @param tag
+	 * @param isReturned
+	 * @return
+	 */
+	private static boolean extracted(ArrayList<Camcorder> camcorderList, String tag, boolean isReturned) {
 		for (int i = 0; i < camcorderList.size(); i++) {
 			if (tag.equalsIgnoreCase(camcorderList.get(i).getAssetTag())
 					&& camcorderList.get(i).getIsAvailable() == false) {
@@ -275,11 +320,17 @@ public class ResourceCentre {
 			}
 		}
 		return isReturned;
-		
 	}
 
 	public static void returnCamcorder(ArrayList<Camcorder> camcorderList) {
 		ResourceCentre.viewAllCamcorder(camcorderList);
+		returningcam(camcorderList);
+	}
+
+	/**
+	 * @param camcorderList
+	 */
+	private static void returningcam(ArrayList<Camcorder> camcorderList) {
 		String tag = Helper.readString("Enter asset tag > ");
 		Boolean isReturned = doReturnCamcorder(camcorderList, tag);
 		
@@ -293,6 +344,18 @@ public class ResourceCentre {
 	public static boolean doReturnChromebook(ArrayList<Chromebook> chromebookList,String tag) {
 		boolean isReturned = false;
 
+		isReturned = returnchromebook(chromebookList, tag, isReturned);
+		return isReturned;
+		
+	}
+
+	/**
+	 * @param chromebookList
+	 * @param tag
+	 * @param isReturned
+	 * @return
+	 */
+	private static boolean returnchromebook(ArrayList<Chromebook> chromebookList, String tag, boolean isReturned) {
 		for (int i = 0; i < chromebookList.size(); i++) {
 			if (tag.equalsIgnoreCase(chromebookList.get(i).getAssetTag())
 					&& chromebookList.get(i).getIsAvailable() == false) {
@@ -303,7 +366,6 @@ public class ResourceCentre {
 			}
 		}
 		return isReturned;
-		
 	}
 	public static void returnChromebook(ArrayList<Chromebook> chromebookList) {
 		// write your code here
